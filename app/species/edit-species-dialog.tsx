@@ -42,17 +42,16 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormData>({
-  resolver: zodResolver(speciesSchema),
-  defaultValues: {
-    scientific_name: species.scientific_name ?? "",
-    common_name: species.common_name ?? "",
-    kingdom: species.kingdom ?? "", 
-    total_population: species.total_population ?? null,
-    image: species.image ?? null,
-    description: species.description ?? null,
-  },
-});
-
+    resolver: zodResolver(speciesSchema),
+    defaultValues: {
+      scientific_name: species.scientific_name ?? "",
+      common_name: species.common_name ?? "",
+      kingdom: species.kingdom ?? "",
+      total_population: species.total_population ?? null,
+      image: species.image ?? null,
+      description: species.description ?? null,
+    },
+  });
 
   const onSubmit = async (input: FormData) => {
     const supabase = createBrowserSupabaseClient();
@@ -100,7 +99,6 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
         <Form {...form}>
           <form onSubmit={(e: BaseSyntheticEvent) => void form.handleSubmit(onSubmit)(e)}>
             <div className="grid w-full items-center gap-4">
-
               <FormField
                 control={form.control}
                 name="scientific_name"
@@ -114,24 +112,22 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="common_name"
                 render={({ field }) => {
-                const { value, ...rest } = field;
-                return (
+                  const { value, ...rest } = field;
+                  return (
                     <FormItem>
-                        <FormLabel>Common Name</FormLabel>
-                        <FormControl>
-                            <Input value={value ?? ""} placeholder="Guinea pig" {...rest} />
-                        </FormControl>
-                    <FormMessage />
+                      <FormLabel>Common Name</FormLabel>
+                      <FormControl>
+                        <Input value={value ?? ""} placeholder="Guinea pig" {...rest} />
+                      </FormControl>
+                      <FormMessage />
                     </FormItem>
-                    );
+                  );
                 }}
-                />
-
+              />
               <FormField
                 control={form.control}
                 name="kingdom"
@@ -158,7 +154,6 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                   </FormItem>
                 )}
               />
-
               <FormField
                 control={form.control}
                 name="total_population"
@@ -177,41 +172,38 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
                   </FormItem>
                 )}
               />
-
-                <FormField
-                    control={form.control}
-                    name="image"
-                    render={({ field }) => {
-                    const { value, ...rest } = field;
-                    return (
-                        <FormItem>
-                            <FormLabel>Image URL</FormLabel>
-                            <FormControl>
-                                <Input value={value ?? ""} placeholder="https://example.com/pic.jpg" {...rest} />
-                            </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                        );
-                    }}
-                    />
-
-                <FormField
-                    control={form.control}
-                    name="description"
-                    render={({ field }) => {
-                    const { value, ...rest } = field;
-                    return (
-                        <FormItem>
-                            <FormLabel>Description</FormLabel>
-                            <FormControl>
-                                <Input value={value ?? ""} placeholder="Species description..." {...rest} />
-                            </FormControl>
-                        <FormMessage />
-                        </FormItem>
-                        );
-                    }}
-                    />
-
+              <FormField
+                control={form.control}
+                name="image"
+                render={({ field }) => {
+                  const { value, ...rest } = field;
+                  return (
+                    <FormItem>
+                      <FormLabel>Image URL</FormLabel>
+                      <FormControl>
+                        <Input value={value ?? ""} placeholder="https://example.com/pic.jpg" {...rest} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => {
+                  const { value, ...rest } = field;
+                  return (
+                    <FormItem>
+                      <FormLabel>Description</FormLabel>
+                      <FormControl>
+                        <Input value={value ?? ""} placeholder="Species description..." {...rest} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  );
+                }}
+              />
               <div className="flex">
                 <Button type="submit" className="ml-1 mr-1 flex-auto">
                   Save Changes
