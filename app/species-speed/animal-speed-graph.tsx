@@ -11,8 +11,10 @@ import { csv } from "d3-fetch";
 // Add more animals or change up the style as you desire
 
 // TODO: Write this interface
-interface AnimalDatum  {
-
+interface AnimalDatum {
+  animal: string;      
+  diet: "carnivore" | "herbivore" | "omnivore";  
+  average_speed: number; 
 }
 
 
@@ -25,46 +27,128 @@ export default function AnimalSpeedGraph() {
 
   // TODO: Load CSV data
   useEffect(() => {
-    console.log("Implement CSV loading!")
+    csv("/clean_dataset.csv").then((data) => {
+      const cleanedData: AnimalDatum[] = data
+        .map((d) => {
+          // Convert average_speed to number safely
+          const speed = d.average_speed ? +d.average_speed : NaN;
+
+          // Skip rows with missing animal name or invalid speed
+          if (!d.animal || isNaN(speed)) return null;
+
+          // Return typed AnimalDatum
+          return {
+            animal: d.animal,
+            diet: d.diet as "carnivore" | "herbivore" | "omnivore",
+            average_speed: speed,
+          };
+        })
+        // Type guard to remove nulls and satisfy TypeScript
+        .filter((d): d is AnimalDatum => d !== null);
+
+      setAnimalData(cleanedData);
+    });
   }, []);
 
-  useEffect(() => {
-    // Clear any previous SVG to avoid duplicates when React hot-reloads
-    if (graphRef.current) {
-      graphRef.current.innerHTML = "";
-    }
+
+useEffect(() => {
+    if (!graphRef.current) return;
+    graphRef.current.innerHTML = "";
 
     if (animalData.length === 0) return;
 
-    // Set up chart dimensions and margins
-    const containerWidth = graphRef.current?.clientWidth ?? 800;
-    const containerHeight = graphRef.current?.clientHeight ?? 500;
+    // Limit to top N fastest animals
+    const topN = 10;
+    const filteredData = [...animalData]
+      .sort((a, b) => b.average_speed - a.average_speed)
+      .slice(0, topN);
 
-    // Set up chart dimensions and margins
-    const width = Math.max(containerWidth, 600); // Minimum width of 600px
-    const height = Math.max(containerHeight, 400); // Minimum height of 400px
-    const margin = { top: 70, right: 60, bottom: 80, left: 100 };
+    const containerWidth = graphRef.current.clientWidth ?? 800;
+    const containerHeight = graphRef.current.clientHeight ?? 500;
+    const width = Math.max(containerWidth, 600);
+    const height = Math.max(containerHeight, 400);
+    const margin = { top: 70, right: 150, bottom: 80, left: 100 };
 
-    // Create the SVG element where D3 will draw the chart
-    // https://github.com/d3/d3-selection
-    const svg  = select(graphRef.current!)
+    const svg = select(graphRef.current)
       .append<SVGSVGElement>("svg")
       .attr("width", width)
-      .attr("height", height)
+      .attr("height", height);
 
-    // TODO: Implement the rest of the graph
-    // HINT: Look up the documentation at these links
-    // https://github.com/d3/d3-scale#band-scales
-    // https://github.com/d3/d3-scale#linear-scales
-    // https://github.com/d3/d3-scale#ordinal-scales
-    // https://github.com/d3/d3-axis
+    // Scales
+    const xScale = scaleBand()
+      .domain(filteredData.map((d) => d.animal))
+      .range([margin.left, width - margin.right])
+      .padding(0.2);
+
+    const yScale = scaleLinear()
+      .domain([0, max(filteredData, (d) => d.average_speed)! * 1.1])
+      .range([height - margin.bottom, margin.top]);
+
+    const colorScale = scaleOrdinal<string>()
+      .domain(["carnivore", "herbivore", "omnivore"])
+      .range(["#e41a1c", "#377eb8", "#4daf4a"]);
+
+    // Bars
+    svg
+      .selectAll("rect")
+      .data(filteredData)
+      .enter()
+      .append("rect")
+      .attr("x", (d) => xScale(d.animal)!)
+      .attr("y", (d) => yScale(d.average_speed))
+      .attr("width", xScale.bandwidth())
+      .attr(
+        "height",
+        (d) => height - margin.bottom - yScale(d.average_speed)
+      )
+      .attr("fill", (d) => colorScale(d.diet));
+
+    // X Axis
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .call(axisBottom(xScale))
+      .selectAll("text")
+      .attr("transform", "rotate(-35)")
+      .style("text-anchor", "end");
+
+    // Y Axis
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .call(axisLeft(yScale));
+
+    // Axis Labels
+    svg
+      .append("text")
+      .attr("x", width / 2)
+      .attr("y", height - 20)
+      .attr("text-anchor", "middle")
+      .text("Animal");
+
+    svg
+      .append("text")
+      .attr("x", -(height / 2))
+      .attr("y", 20)
+      .attr("transform", "rotate(-90)")
+      .attr("text-anchor", "middle")
+      .text("Speed (km/h)");
+
+    // Legend
+    const legend = svg.append("g").attr(
+      "transform",
+      `translate(${width - margin.right + 20}, ${margin.top})`
+    );
+
+    ["carnivore", "herbivore", "omnivore"].forEach((diet, i) => {
+      const g = legend.append("g").attr("transform", `translate(0, ${i * 25})`);
+      g.append("rect").attr("width", 20).attr("height", 20).attr("fill", colorScale(diet));
+      g.append("text").attr("x", 25).attr("y", 15).text(diet);
+    });
   }, [animalData]);
-
   // TODO: Return the graph
-  return (
     // Placeholder so that this compiles. Delete this below:
-    <div>
-      <h1> TODO: Delete this div in `animal-speed-graph.tsx` and implement the graph: </h1>
-    </div>
-  );
+    return <div ref={graphRef} style={{ width: "100%", height: "500px" }} />;
+
+
 }

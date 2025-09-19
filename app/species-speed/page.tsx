@@ -28,13 +28,9 @@ export default async function SpeciesSpeedPage() {
       </div>
       <Separator className="my-4" />
       <section className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">How Fast Are Animals?</h1>
+        <h1 className="text-2xl font-bold mb-2">Top 10 Fastest Animals by Diet</h1>
         <p className="text-white-700">
-          The animal kingdom is full of speedsters, from the lightning-fast cheetah to the surprisingly swift pronghorn antelope.
-           But not all animals are built for speed—herbivores, omnivores, and carnivores have evolved different strategies for survival,
-           and their top velocities reflect their lifestyles. Carnivores often rely on bursts of speed to catch prey, while herbivores
-           may need to outrun predators, and omnivores fall somewhere in between. The graph below compares the velocities of various animals,
-            grouped by their dietary category, to reveal fascinating patterns in nature’s race for survival.
+          This bar chart compares the average speeds of the top 10 fastest animals in our dataset, grouped by their diet type: carnivore, herbivore, or omnivore. Each bar represents one animal, with its height corresponding to its average speed (km/h). Colors indicate diet, allowing for quick visual comparison across dietary groups. The chart highlights patterns such as carnivores generally being faster than herbivores and omnivores, and provides an easy-to-read visualization of animal mobility differences.
         </p>
       </section>
       <AnimalSpeedGraph />

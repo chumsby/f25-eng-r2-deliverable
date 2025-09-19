@@ -13,9 +13,12 @@ can cause errors with matching props and state in child components if the list o
 import { Button } from "@/components/ui/button";
 import type { Database } from "@/lib/schema";
 import Image from "next/image";
+import SpeciesDetailDialog from "./species-detail-dialog";
+import EditSpeciesDialog from "./edit-species-dialog";
+
 type Species = Database["public"]["Tables"]["species"]["Row"];
 
-export default function SpeciesCard({ species }: { species: Species }) {
+export default function SpeciesCard({ species, sessionId }: { species: Species; sessionId: string }) {
   return (
     <div className="m-4 w-72 min-w-72 flex-none rounded border-2 p-3 shadow">
       {species.image && (
@@ -27,7 +30,8 @@ export default function SpeciesCard({ species }: { species: Species }) {
       <h4 className="text-lg font-light italic">{species.common_name}</h4>
       <p>{species.description ? species.description.slice(0, 150).trim() + "..." : ""}</p>
       {/* Replace the button with the detailed view dialog. */}
-      <Button className="mt-3 w-full">Learn More</Button>
+      <SpeciesDetailDialog species={species} />
+      {species.author === sessionId && <EditSpeciesDialog species={species} />}
     </div>
   );
 }
