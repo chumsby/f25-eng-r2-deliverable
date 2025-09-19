@@ -13,7 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
 import { toast } from "@/components/ui/use-toast";
 import { createBrowserSupabaseClient } from "@/lib/client-utils";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -43,16 +42,17 @@ export default function EditSpeciesDialog({ species }: { species: Species }) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<FormData>({
-    resolver: zodResolver(speciesSchema),
-    defaultValues: {
-      scientific_name: species.scientific_name ?? "",
-      common_name: species.common_name,
-      kingdom: species.kingdom as any,
-      total_population: species.total_population,
-      image: species.image,
-      description: species.description,
-    },
-  });
+  resolver: zodResolver(speciesSchema),
+  defaultValues: {
+    scientific_name: species.scientific_name ?? "",
+    common_name: species.common_name ?? "",
+    kingdom: species.kingdom ?? "", 
+    total_population: species.total_population ?? null,
+    image: species.image ?? null,
+    description: species.description ?? null,
+  },
+});
+
 
   const onSubmit = async (input: FormData) => {
     const supabase = createBrowserSupabaseClient();
